@@ -10,3 +10,6 @@ source_code/
 
 # 归档的一次性实验
 docs/archive/
+
+# Claude Code 本地配置（机器特定，不该共享）
+.claude/

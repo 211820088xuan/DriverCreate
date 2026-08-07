@@ -330,7 +330,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "fixture":
         p1 = write_sample_skeletons()
         p2 = write_sample_scenario()
-        print(f"[skeleton_loader] 夹具已写入:\n  {p1}\n  {p2}")
+        print(f"[contracts.skeletons] 夹具已写入:\n  {p1}\n  {p2}")
     else:
         # 自测：校验样例
         issues1 = validate_skeletons(SAMPLE_SKELETONS)
@@ -342,4 +342,4 @@ if __name__ == "__main__":
             sys.exit(1)
         print(f"SAMPLE_SKELETONS 校验通过（{len(SAMPLE_SKELETONS['skeletons'])} 条骨架）")
         print(f"SAMPLE_SCENARIO 校验通过（{len(SAMPLE_SCENARIO['skeleton_ids'])} 条 skeleton_id）")
-        print(f"  用法：python3 skeleton_loader.py fixture  # 落盘夹具")
+        print(f"  用法：python3 -m contracts.skeletons fixture  # 落盘夹具")

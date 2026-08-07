@@ -348,7 +348,7 @@ def agent_build_fix(project: str, build_routes: list[dict],
 def main():
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python3 -m agent.agent_build_fix <project> [--mode=focus|peer|cross]")
+        print("Usage: python3 -m tools.step3_agent.agent_build_fix <project> [--mode=focus|peer|cross]")
         sys.exit(1)
     project = sys.argv[1]
     mode = None

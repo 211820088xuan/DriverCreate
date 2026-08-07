@@ -477,7 +477,7 @@ def agent_triage(project: str, log_path: str, failed_targets: list[str],
 def main():
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python3 -m agent.agent_triage <project> [failed_target ...] "
+        print("Usage: python3 -m tools.step3_agent.agent_triage <project> [failed_target ...] "
               "[--mode=focus|peer|cross]")
         sys.exit(1)
     project = sys.argv[1]

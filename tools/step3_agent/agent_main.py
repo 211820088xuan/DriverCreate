@@ -1028,7 +1028,7 @@ def agent_main_inject(project: str, max_steps: int = 16,
 def main():
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python3 -m agent.agent_main <project> "
+        print("Usage: python3 -m tools.step3_agent.agent_main <project> "
               "[--restage | --backup | --copy | --nonfatal | --build | --diff | --inject] "
               "[--mode focus|peer|cross]")
         sys.exit(1)

@@ -351,7 +351,7 @@ def _build_summary(project: str, rounds_run: int, last_kind: dict[str, str],
 def main():
     args = sys.argv[1:]
     if not args:
-        print("Usage: python3 -m agent.agent_pipeline <project> [--max-rounds=N] "
+        print("Usage: python3 -m tools.step3_agent.agent_pipeline <project> [--max-rounds=N] "
               "[--mode=focus|peer|cross]")
         sys.exit(1)
     project = args[0]

@@ -33,42 +33,44 @@ payload 等均为本领域标准技术名词，术语免责声明见 [CLAUDE.md]
 
 ```
 driver_create/
-├── run_pipeline.py            # 一键流水线入口（编排 step1 → headers → step2 → agent 修复）
+├── run_pipeline.py            # 一键流水线入口（编排 step1 → headers → step2 → step3 修复）
 ├── step1_prepare.py           # Step1 情报收集：图谱 + 模板提取 + 构建画像 + API 打分
 ├── step2_generate.py          # Step2 LLM 并行生成 driver（含 L1–L4 硬验证 + 编译预检）
-├── step3_build.py             # Step3 第三阶段入口：注入+构建+分诊+修复循环（委托 agent_pipeline）
-├── plan_loader.py             # plan_<mode>.json 读写 + schema 校验（库模块，step2/plan_gen 共用）
+├── step3_build.py             # Step3 第三阶段入口：注入+构建+分诊+修复循环（委托 tools.step3_agent.agent_pipeline）
 ├── config.py                  # 全局配置：路径、Neo4j、LLM 凭证与模型、调优常量
 ├── README.md                  # 本文件
 ├── CLAUDE.md                  # 项目性质说明 + 术语免责声明 + 工作同步约定
 │
-├── agent/                     # 多 Agent 编译修复循环（正规 Python 包，用 -m 运行）
-│   ├── __init__.py            #   sys.path 引导：让包内绝对 import 与根目录 config 都能解析
-│   ├── agent_pipeline.py      #   编排器：注入 → 构建 → 分诊 → 分发修复 → 重构建，循环 ≤N 轮
-│   ├── agent_main.py          #   主/注入 Agent + 确定性动作（restage / build / diff）
-│   ├── agent_triage.py        #   分诊 Agent：失败 driver 判成 code（源码错）或 build（构建/链接错）
-│   ├── agent_repair.py        #   代码修复 Agent：改 output/ 下的 driver 源码
-│   ├── agent_build_fix.py     #   构建修复 Agent：改 build.sh / Dockerfile 的 dc-injected 标记块
-│   └── agent_common.py        #   共享底座：路径沙箱、标记块读写、.dcbak 备份、通用 LLM tool-loop
+├── contracts/                 # 数据契约层（核心 JSON schema + 夹具）
+│   ├── skeletons.py           #   skeletons.json + scenario/*.json 读写 + schema 校验
+│   └── plans.py               #   plan_<mode>.json 读写 + schema 校验
 │
 ├── docs/                      # 文档
-│   ├── log.md                 #   开发日志（开发前必读）
-│   ├── multi_agent_build_repair_spec.md  # 多 Agent 修复循环实现规格
-│   ├── auto_clone_source.md   #   源码自动克隆机制说明
-│   └── triage_optimization.md #   分诊调优记录
+│   └── log.md                 #   开发日志（开发前必读）
 │
-├── tools/                      # 工具脚本（手动运行，非 pipeline 阶段）
-│   ├── step1_tools/        #   step1 前置：KG 数据富化与检查
-│   │   ├── add_call_order.py    # 给 KG CALLS 边补 order/order_last（step1 Q 查询依赖）
-│   │   └── kg_gap_query.py      # 只读查询：driver 调用但无 order 边的 API 缺口
-│   ├── step2_tools/        #   step2 前置：生成 driver 的数据准备
-│   │   ├── analyze_fuzzing_headers.py  # 头文件白名单（pipeline 调用，产 fuzzing_headers.json）
+├── tools/                     # 工具脚本与子模块包
+│   ├── step0_tools/           #   全局前置：骨架库构建（跨项目，全局一次）
+│   │   ├── add_call_order.py    # 给 KG CALLS 边补 order/order_last
+│   │   ├── kg_gap_query.py      # 只读查询：driver 调用但无 order 边的 API 缺口
 │   │   ├── export_role_dataset.py # 导出 role 标注数据集 + 阶段 0 体检报告
 │   │   ├── role_annotate.py     # Phase 5: LLM 标注 API 角色
-│   │   ├── skeleton_mine.py     # Phase 6: 挖骨架序列
-│   │   └── plan_gen.py          # Phase 6b: 三模式 plan 生成（focus/peer/cross）
-│   ├── coverage_tools/    #   fuzz 后覆盖率统计
-│   │   └── aggregate_coverage.py # 去重并集统计（new vs origin 对比）
+│   │   ├── relabel_data_sink.py # 收紧 data_sink 角色重标
+│   │   └── skeleton_mine.py     # Phase 6: 挖骨架序列
+│   ├── step1_tools/           #   本项目静态信息采集（不碰图谱）
+│   │   └── analyze_fuzzing_headers.py  # 头文件白名单（pipeline 调用，产 fuzzing_headers.json）
+│   ├── step2_tools/           #   计划生成 + 驱动生成组件
+│   │   ├── plan_gen.py          # Phase 6b: 三模式 plan 生成（focus/peer/cross）
+│   │   └── llm_fill_concurrent.py # 并发跑多项目 plan_gen（按需 LLM 填槽）
+│   ├── step3_agent/           #   多 Agent 编译修复循环（正规 Python 包，用 -m 运行）
+│   │   ├── __init__.py          #   sys.path 引导：根目录 config 可解析
+│   │   ├── agent_pipeline.py    #   编排器：注入 → 构建 → 分诊 → 分发修复 → 重构建，循环 ≤N 轮
+│   │   ├── agent_main.py        #   主/注入 Agent + 确定性动作（restage / build / diff）
+│   │   ├── agent_triage.py      #   分诊 Agent：失败 driver 判成 code（源码错）或 build（构建/链接错）
+│   │   ├── agent_repair.py      #   代码修复 Agent：改 output/ 下的 driver 源码
+│   │   ├── agent_build_fix.py   #   构建修复 Agent：改 build.sh / Dockerfile 的 dc-injected 标记块
+│   │   └── agent_common.py      #   共享底座：路径沙箱、标记块读写、.dcbak 备份、通用 LLM tool-loop
+│   ├── coverage_tools/       #   fuzz 后覆盖率统计
+│   │   └── aggregate_coverage.py # union-vs-k 曲线（origin/focus/peer/cross 四组）
 │   └── clear.sh             #   项目清理工具（开发用）
 │
 ├── source_code/<project>/     # 克隆的上游项目源码（缺失时按 project.yaml 自动克隆）
@@ -103,7 +105,7 @@ driver_create/
 │                                                                          │
 │                       ── 加 --build 才进入 ──                            │
 │                                                                          │
-│  step3_build（第三阶段 · 内部委托 agent.agent_pipeline）                  │
+│  step3_build（第三阶段 · 内部委托 tools.step3_agent.agent_pipeline）            │
 │    注入 → 构建 → 分诊 → 分发修复 → 重构建   循环 ≤ max_rounds              │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -167,13 +169,13 @@ python3 run_pipeline.py c-blosc2 --skip-llm
 
 ## 分步 / 单模块运行
 
-根目录脚本直接按文件跑；`agent/` 包内模块必须用 **`python3 -m agent.<模块>`** 跑（包内用绝对
-import + sys.path 引导，不能再 `python3 agent/xxx.py` 直跑）：
+根目录脚本直接按文件跑；`tools/step3_agent/` 包内模块必须用 **`python3 -m tools.step3_agent.<模块>`** 跑（包内用绝对
+import + sys.path 引导，不能再 `python3 tools/step3_agent/xxx.py` 直跑）：
 
 ```bash
 # —— 流水线各步（根目录脚本）——
 python3 step1_prepare.py <project>              # 情报收集 + API 打分 + 构建画像
-python3 tools/analyze_fuzzing_headers.py <project>  # 头文件白名单（pipeline 自动调，也可单跑）
+python3 tools/step1_tools/analyze_fuzzing_headers.py <project>  # 头文件白名单（pipeline 自动调，也可单跑）
 python3 step2_generate.py <project> [N]         # LLM 生成 N 个 driver
 python3 step3_build.py <project>                # 第三阶段：注入 + 构建 + 分诊 + 修复循环（默认）
 python3 step3_build.py <project> --max-rounds=N # 指定修复循环最大轮数（默认 3）
@@ -181,12 +183,12 @@ python3 step3_build.py <project> --mode=focus  # 三模式之一（focus/peer/cr
 python3 step3_build.py <project> --no-repair    # 确定性兜底：restage + 构建 + 比对，不修复
 python3 step3_build.py <project> --no-build     # 只比对现有 oss-bin 产物，不重构建
 
-# —— agent 包（-m 形式；step3_build 默认就委托 agent.agent_pipeline，下面供单独调试）——
-python3 -m agent.agent_pipeline <project> [--max-rounds=N] [--mode=focus|peer|cross]
-python3 -m agent.agent_main <project> --diff    # 期望 vs 实际产物比对（确定性，不需 Docker/LLM）
-python3 -m agent.agent_main <project> --diff --mode=focus  # 按 mode 比对
-python3 -m agent.agent_triage <project> [failed_target ...] [--mode=focus|peer|cross]
-python3 -m agent.agent_build_fix <project> [--mode=focus|peer|cross]
+# —— tools.step3_agent 包（-m 形式；step3_build 默认就委托 tools.step3_agent.agent_pipeline，下面供单独调试）——
+python3 -m tools.step3_agent.agent_pipeline <project> [--max-rounds=N] [--mode=focus|peer|cross]
+python3 -m tools.step3_agent.agent_main <project> --diff    # 期望 vs 实际产物比对（确定性，不需 Docker/LLM）
+python3 -m tools.step3_agent.agent_main <project> --diff --mode=focus  # 按 mode 比对
+python3 -m tools.step3_agent.agent_triage <project> [failed_target ...] [--mode=focus|peer|cross]
+python3 -m tools.step3_agent.agent_build_fix <project> [--mode=focus|peer|cross]
 ```
 
 ---
@@ -226,7 +228,7 @@ python3 -m agent.agent_build_fix <project> [--mode=focus|peer|cross]
 ### 第三阶段 · 编译验证与修复（`step3_build.py`）
 
 `run_pipeline.py` 加 `--build` 时，第三阶段调用 **`step3_build.py`**；它默认**委托
-`agent.agent_pipeline`** 跑多 Agent 编译修复循环。构建模型（见
+`tools.step3_agent.agent_pipeline`** 跑多 Agent 编译修复循环。构建模型（见
 [spec](docs/multi_agent_build_repair_spec.md) §3）：
 
 1. driver 源码在 `artifacts/output/<project>/`。

@@ -405,7 +405,7 @@ def write_sample_fixture(project: str = "c-blosc2", mode: str = "peer") -> Path:
     """把 SAMPLE_PLAN 落盘为 intermediate/<project>/plan_<mode>.json（夹具）。
 
     用于 step2 改造时在没有真实 plan_gen 产出的情况下先跑通。
-    调试用：python3 -c 'import plan_loader as p; p.write_sample_fixture()'
+    调试用：python3 -c 'import contracts.plans as p; p.write_sample_fixture()'
     """
     p = plan_path(project, mode)
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -413,7 +413,7 @@ def write_sample_fixture(project: str = "c-blosc2", mode: str = "peer") -> Path:
     plan["project"] = project
     plan["mode"] = mode
     p.write_text(json.dumps(plan, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"[plan_loader] 样例夹具已写入 {p}")
+    print(f"[contracts.plans] 样例夹具已写入 {p}")
     return p
 
 
@@ -433,4 +433,4 @@ if __name__ == "__main__":
             sys.exit(1)
         print(f"SAMPLE_PLAN 校验通过（{len(SAMPLE_PLAN['drivers'])} driver, "
               f"{len(SAMPLE_PLAN['skipped'])} skipped）")
-        print(f"  用法：python3 plan_loader.py fixture [project] [mode]  # 落盘夹具")
+        print(f"  用法：python3 -m contracts.plans fixture [project] [mode]  # 落盘夹具")

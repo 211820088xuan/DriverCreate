@@ -72,7 +72,7 @@ def intermediate_for(project):
 MODES = ("focus", "peer", "cross")
 
 # 骨架驱动重构：角色词表版本 + 排序字段（§2.1/§2.2）
-# plan_loader / skeleton_loader / skeleton_mine / plan_gen 共用，单点定义
+# contracts.plans / contracts.skeletons / skeleton_mine / plan_gen 共用，单点定义
 PLAN_VERSION = "v4"           # vocab_version：create/configure/data_sink/process/destroy
 ORDER_FIELD = "order_last"    # CALLS 边排序字段（按末次出现，§2.2 已验证）
 ROLES = ("create", "configure", "data_sink", "process", "destroy")

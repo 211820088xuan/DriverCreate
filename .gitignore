@@ -8,8 +8,8 @@ artifacts/
 # 上游项目克隆（体积大，按需重新 clone）
 source_code/
 
-# 归档的一次性实验
-docs/archive/
+# 归档的一次性实验 + 开发日志（本地，不入仓库）
+docs/
 
 # Claude Code 本地配置（机器特定，不该共享）
 .claude/

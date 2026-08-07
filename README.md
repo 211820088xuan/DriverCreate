@@ -50,10 +50,8 @@ driver_create/
 ├── tools/                     # 工具脚本与子模块包
 │   ├── step0_tools/           #   全局前置：骨架库构建（跨项目，全局一次）
 │   │   ├── add_call_order.py    # 给 KG CALLS 边补 order/order_last
-│   │   ├── kg_gap_query.py      # 只读查询：driver 调用但无 order 边的 API 缺口
 │   │   ├── export_role_dataset.py # 导出 role 标注数据集 + 阶段 0 体检报告
 │   │   ├── role_annotate.py     # Phase 5: LLM 标注 API 角色
-│   │   ├── relabel_data_sink.py # 收紧 data_sink 角色重标
 │   │   └── skeleton_mine.py     # Phase 6: 挖骨架序列 → skeletons.json
 │   ├── step1_tools/           #   Step1 四段组件 + 头文件白名单（不碰图谱的四段在此）
 │   │   ├── graph_query.py      #   A 段：图谱情报（Neo4j）→ setup.json

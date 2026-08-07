@@ -9,6 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 import json
 from config import intermediate_for
 
+# 打分权重（归一化加权和，两分量均 ∈[0,1]，权重和=1，可调；详见 docs/scoring.md）
+# w1 主导：未测 API 优先；w2：富化完整度（tiebreaker，签名>参数>描述）
+W_UNTESTED, W_INFO = 0.85, 0.15
+
 # ══════════════════════════════════════════════════════════════════════
 # Section D: API 分类 & 打分
 # ══════════════════════════════════════════════════════════════════════
@@ -20,11 +24,6 @@ def run_api_scoring(project, setup_data):
     untested_set = set(setup_data.get("untested_apis", []))
     tested_map = {t["name"]: t.get("drivers", []) for t in setup_data.get("tested_apis", [])}
 
-    peer_usage = {}
-    for pdp in setup_data.get("peer_driver_patterns", []):
-        for api in pdp.get("apis", []):
-            peer_usage[api] = peer_usage.get(api, 0) + 1
-
     # api_enrich 富化元数据（signature/params/... 来自 Q6 的 all_apis）
     meta_map = {e["name"]: e for e in setup_data.get("all_apis", []) if e.get("name")}
 
@@ -35,24 +34,26 @@ def run_api_scoring(project, setup_data):
             continue
         is_untested = name in untested_set
         is_tested = name in tested_map
-        pu = peer_usage.get(name, 0)
 
         meta = meta_map.get(name, {})
         signature = meta.get("signature", "")
         params = meta.get("params", []) or []
         description = meta.get("description", "")
         has_info = bool(signature)
-        # 软加分：信息完整度只在同层内提升排序，刻意小于 untested(+15)
-        info_bonus = min(
+
+        # 归一化分量（均 ∈ [0,1]），加权求和；权重 W_UNTESTED/W_INFO 见模块顶
+        untested_norm = 1.0 if is_untested else 0.0
+        info_norm = min(
             (4 if signature else 0) + (3 if params else 0) + (2 if description else 0),
             9,
-        )
-
-        total = pu * 1 + (15 if is_untested else 0) + info_bonus
+        ) / 9
+        total = W_UNTESTED * untested_norm + W_INFO * info_norm
         scored.append({
-            "api": name, "peer_usage_score": pu,
+            "api": name,
             "already_fuzzed": is_tested, "untested": is_untested,
-            "total_score": max(total, 0), "peers": [],
+            "untested_norm": untested_norm,
+            "info_norm": info_norm,
+            "total_score": round(total, 4),
             "existing_drivers": tested_map.get(name, []),
             # P1 #6：接入 setup 的 api_dependencies（共现关系，focus 规则2 用）
             "dependencies": setup_data.get("api_dependencies", {}).get(name, []),

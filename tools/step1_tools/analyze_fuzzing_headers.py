@@ -6,6 +6,10 @@
 - 模式 A：项目自带 fuzzing 基础设施（如 fuzzer.h、fuzzer-common.h）
 - 模式 B：OSS-Fuzz 特定构建依赖（如 common.h，FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION）
 - 模式 C：混合模式（部分项目工具、部分测试框架）
+
+归位说明：本脚本读 PROJECTS_DIR / SRC_DIR、产物落 intermediate/<project>/fuzzing_headers.json，
+输入输出都和 step1 的 Section B（模板提取）/ C（构建画像）同类——是 step1 阶段的静态信息
+采集，不是 step2 的工具，故从 tools/step2_tools/ 归位到 tools/step1_tools/。
 """
 
 import os

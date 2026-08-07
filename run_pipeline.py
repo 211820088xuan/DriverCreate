@@ -175,7 +175,7 @@ def main():
 
     # ── 头文件白名单（mode-agnostic）──
     if not opts["skip_headers"]:
-        run("tools/step2_tools/analyze_fuzzing_headers.py", project)  # 非致命
+        run("tools/step1_tools/analyze_fuzzing_headers.py", project)  # 非致命
 
     # ── skeleton_mine（全局一次，产 skeletons.json；已存在则跳过）──
     from config import shared_dir

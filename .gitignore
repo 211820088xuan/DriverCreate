@@ -1,0 +1,12 @@
+# Python 字节码缓存（每次运行自动生成，不该进版本库）
+__pycache__/
+*.py[cod]
+
+# 生成产物（driver 源码/二进制、中间 JSON、日志、crash、覆盖率）
+artifacts/
+
+# 上游项目克隆（体积大，按需重新 clone）
+source_code/
+
+# 归档的一次性实验
+docs/archive/

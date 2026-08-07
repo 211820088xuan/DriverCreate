@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(f'Generated: {d[\\\\\"num_generated\\\\\"]}/{d[\\\\\"target_count\\\\\"]} drivers, Total attempts: {d[\\\\\"total_attempts\\\\\"]}'\\)\")",
+      "Bash(python3 *)",
+      "Bash(cat)",
+      "Bash(cp /tmp/test_broken_fuzzer.c /root/gyx/driver_create/output/c-blosc2/test_broken_fuzzer.c)",
+      "Bash(git clone *)",
+      "Read(//root/gyx/oss-fuzz/projects/ndpi/**)",
+      "Read(//root/gyx/**)",
+      "Bash(find / -maxdepth 4 -name \"nDPI*\" -o -name \"ndpi*\")",
+      "Bash(GIT_SSL_NO_VERIFY=1 git clone --depth 1 https://github.com/ntop/nDPI.git /root/gyx/driver_create/src/ndpi)",
+      "Bash(gcc -dM -E - -std=gnu11)",
+      "Bash(./autogen.sh)",
+      "Bash(./configure --enable-fuzztargets)",
+      "Bash(clang -fsyntax-only -x c -std=gnu11 -Wall -D_GNU_SOURCE -D_DEFAULT_SOURCE=1 -I/root/gyx/driver_create/src/ndpi/src/include -I/root/gyx/driver_create/src/ndpi/src/lib -I/root/gyx/driver_create/src/ndpi/src/lib/third_party/include /root/gyx/projects/ndpi/fuzz_process_packet.c)",
+      "Bash(python3 -c ' *)",
+      "Bash(tmux new-session *)",
+      "Read(//tmp/**)",
+      "Bash(tmux kill-session *)",
+      "Bash(bash -n run_kg_experiment.sh)",
+      "Bash(chmod +x run_kg_experiment.sh)",
+      "Bash(tmux ls *)",
+      "Bash(docker system *)",
+      "Bash(file /root/gyx/oss-fuzz/oss-bin/capstone/new/*)",
+      "Bash(docker image *)",
+      "Bash(timeout 180 docker run --rm --privileged --shm-size=1g --network=host -v /root/gyx/oss-fuzz/oss-bin/sql-parser/new:/src:ro -e ASAN_OPTIONS=detect_leaks=0:abort_on_error=0 gcr.io/oss-fuzz-base/base-runner bash -c 'cp /src/sql_parser_v2_crfuzzer /tmp/t && cd /tmp && \\(./t -runs=2000 -print_coverage=1 > /tmp/out.txt 2>&1; echo \"EXIT=$?\"\\); echo \"===TOTAL LINES===\"; wc -l /tmp/out.txt; echo \"===GREP KEY MARKERS===\"; grep -nE \"COVERAGE:|COVERED_FUNC|UNCOVERED_FUNC|COVERED_LINE|UNCOVERED_LINE|cov: |stat::\" /tmp/out.txt | head -40; echo \"===RAW SAMPLE \\(first COVERED_FUNC block\\)===\"; grep -A2 \"COVERED_FUNC\" /tmp/out.txt | head -20')",
+      "Bash(timeout 180 docker run --rm --privileged --shm-size=1g --network=host -v /root/gyx/oss-fuzz/oss-bin/sql-parser/new:/src:ro -e ASAN_OPTIONS=detect_leaks=0:abort_on_error=0 gcr.io/oss-fuzz-base/base-runner bash -c 'cp /src/sql_parser_v2_crfuzzer /tmp/t && cd /tmp && \\(./t -runs=20000 -print_pcs=1 > /tmp/pcs.txt 2>&1; echo \"EXIT=$?\"\\); echo \"===total lines===\"; wc -l /tmp/pcs.txt; echo \"===NEW_PC count===\"; grep -c \"NEW_PC\" /tmp/pcs.txt; echo \"===NEW_PC samples===\"; grep \"NEW_PC\" /tmp/pcs.txt | head -15; echo \"===unique symbolized file:line among NEW_PC===\"; grep \"NEW_PC\" /tmp/pcs.txt | grep -oE \"[^ ]+\\\\.\\(cpp|cc|c|h|hpp\\):[0-9]+\" | sort -u | head -20; echo \"===unique count===\"; grep \"NEW_PC\" /tmp/pcs.txt | grep -oE \"[^ ]+\\\\.\\(cpp|cc|c|h|hpp\\):[0-9]+\" | sort -u | wc -l')",
+      "Bash(timeout 260 docker run --rm --privileged --shm-size=1g --network=host -v /root/gyx/oss-fuzz/oss-bin/sql-parser/new:/src:ro -e ASAN_OPTIONS=detect_leaks=0:abort_on_error=0 gcr.io/oss-fuzz-base/base-runner bash -c ' *)",
+      "Bash(timeout 200 docker run --rm --privileged --shm-size=1g --network=host -v /root/gyx/oss-fuzz/oss-bin/sql-parser/origin:/src:ro -e ASAN_OPTIONS=detect_leaks=0:abort_on_error=0 gcr.io/oss-fuzz-base/base-runner bash -c ' *)",
+      "Bash(timeout 120 docker run --rm --privileged --shm-size=1g --network=host -v /root/gyx/oss-fuzz/oss-bin/sql-parser/new:/src:ro -e ASAN_OPTIONS=detect_leaks=0:abort_on_error=0 gcr.io/oss-fuzz-base/base-runner bash -c ' *)"
+    ]
+  }
+}

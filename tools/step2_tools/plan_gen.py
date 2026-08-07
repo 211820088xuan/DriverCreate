@@ -17,7 +17,7 @@ plan_gen.py — Phase 6b: 三模式 plan 生成（focus / peer / cross）
   cross: 骨架池中 d(k)≥3 的（结构最远），同 peer 逻辑
 
 槽位填充（§7.2）：
-  C 项目：签名规则快速筛（低召回 ~19%），未命中过 LLM（_llm_fill_missing_roles 已实现）
+  C 项目：签名规则快速筛（低召回 ~19%），未命中由 _llm_fill_top_n 并发预标 top N（混合方案）
   C++ 方法（signature 含 ::）：跳过签名规则，直接走 role_labels（LLM 标注）
   填不满任何一个槽 → 整条跳过，记 skipped（§4.3 必须有）
 
@@ -38,58 +38,6 @@ try:
 except ImportError:
     _annotate_batch = None
 from contracts.skeletons import load_skeletons, load_scenario, skeleton_by_id
-
-
-def _llm_fill_missing_roles(project: str, scored_apis: list[dict],
-                            role_labels: dict[str, str]) -> dict[str, str]:
-    """对 role_labels 未覆盖的 API 批量调 LLM 标注角色，结果追加缓存到 role_labels.jsonl。
-
-    复用 role_annotate 的 _annotate_batch（分批 + 完整性校验）+ _append_cache。
-    role_labels.jsonl 按 (project, api) 索引（项目内 api 名唯一）。
-    """
-    if not scored_apis:
-        return role_labels
-    # 找未标注 API
-    missing = [a for a in scored_apis if a.get("api") and a["api"] not in role_labels]
-    if not missing:
-        return role_labels
-    try:
-        from role_annotate import _annotate_batch, _append_cache, BATCH_SIZE, FAST_MODEL, STRONG_MODEL
-    except ImportError:
-        print(f"  [llm_fill] 无法 import role_annotate，跳过 LLM 填槽（{len(missing)} 个未标注）")
-        return role_labels
-
-    print(f"  [llm_fill] {project}: {len(missing)} 个 API 未标注，批量调 LLM（批 {BATCH_SIZE}）")
-    # 批量标注：fast 模型先跑，incomplete 的用 strong 兜底
-    all_results = []
-    for bi in range(0, len(missing), BATCH_SIZE):
-        batch = missing[bi: bi + BATCH_SIZE]
-        # 补 project 字段（_annotate_batch 要 project）
-        for e in batch:
-            e.setdefault("project", project)
-        results = _annotate_batch(batch, FAST_MODEL)
-        # fast 的 incomplete 用 strong 重跑（_annotate_batch 返回长度恒=batch，用 incomplete 标记判断）
-        incomplete_apis = {r["api"] for r in results if r.get("incomplete")}
-        if incomplete_apis:
-            retry = [e for e in batch if e["api"] in incomplete_apis]
-            results2 = _annotate_batch(retry, STRONG_MODEL)
-            # strong 的结果覆盖 incomplete 的
-            by_api = {r["api"]: r for r in results2 if not r.get("incomplete")}
-            results = [by_api.get(r["api"], r) if r.get("incomplete") else r for r in results]
-        all_results.extend(results)
-
-    # 追加到 role_labels.jsonl（plan_gen 的 _load_role_labels 读这个文件）
-    if all_results:
-        out_path = shared_dir() / "role_labels.jsonl"
-        with open(out_path, "a", encoding="utf-8") as f:
-            for r in all_results:
-                f.write(json.dumps(r, ensure_ascii=False) + "\n")
-        # 更新内存 role_labels
-        for r in all_results:
-            if r.get("role") in ROLES or r.get("role") == "query" or r.get("role") == "unknown":
-                role_labels[r["api"]] = r["role"]
-        print(f"  [llm_fill] {project}: LLM 标注 {len(all_results)} 个，已追加到 role_labels.jsonl")
-    return role_labels
 
 
 def _llm_fill_on_demand(project: str, batch: list[dict],

@@ -69,9 +69,11 @@ DRIVER_STEM_SUFFIX = "_crfuzzer"
 STAGED_MANIFEST = "staged_manifest.json"
 
 # 注入标记块（幂等重写的锚）
-DC_TAIL_BEGIN = "# >>> dc-injected >>>"        # 末尾块：Dockerfile COPY / build.sh 编译循环
-DC_TAIL_END = "# <<< dc-injected <<<"
-DC_HEAD_BEGIN = "# >>> dc-injected-head >>>"   # build.sh 头部块：set +e
+# DC_TAIL_* 与 agent_common.MARKER_* 字面相同，统一引用单一来源（避免两边各定义一份、
+# 改一边静默错位 → 修复 agent 找不到块走追加分支，在 exit 0 之后追加第二个块永不执行）。
+DC_TAIL_BEGIN = ac.MARKER_BEGIN   # 末尾块：Dockerfile COPY / build.sh 编译循环
+DC_TAIL_END = ac.MARKER_END
+DC_HEAD_BEGIN = "# >>> dc-injected-head >>>"   # build.sh 头部块：set +e（另一对，用途不同，保留独立定义）
 DC_HEAD_END = "# <<< dc-injected-head <<<"
 
 # 主 agent 可备份/注入的文件

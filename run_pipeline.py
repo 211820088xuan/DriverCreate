@@ -182,7 +182,7 @@ def main():
     skeletons_file = shared_dir() / "skeletons.json"
     if not skeletons_file.is_file():
         print("\n[Phase 6] skeleton_mine 全局挖骨架池（仅首次）...")
-        run("tools/step2_tools/skeleton_mine.py", None, fatal=False)
+        run("tools/step0_tools/skeleton_mine.py", None, fatal=False)
     else:
         print(f"\n[Phase 6] skeletons.json 已存在（{skeletons_file}），跳过 skeleton_mine")
 

@@ -30,7 +30,7 @@ from typing import Optional
 from collections import defaultdict
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-sys.path.insert(0, str(Path(__file__).resolve().parent))  # 便于 import role_annotate
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "step0_tools"))  # 便于 import role_annotate（已搬至 step0_tools）
 from config import intermediate_for, MODES, ROLES, shared_dir
 from plan_loader import save_plan, empty_plan, PLAN_VERSION
 try:

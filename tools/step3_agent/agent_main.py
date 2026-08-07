@@ -45,7 +45,7 @@ _GLOBAL_BUILD_COUNT = 0
 def global_build_count() -> int:
     """返回当前累计的 Docker 构建次数（agent_main_build 每次递增）。"""
     return _GLOBAL_BUILD_COUNT
-import agent_common as ac
+from tools.step3_agent import agent_common as ac
 
 try:
     import yaml

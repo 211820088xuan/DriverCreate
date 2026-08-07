@@ -21,8 +21,8 @@ from pathlib import Path
 from typing import Any, Optional
 
 from config import OSS_FUZZ_DIR, SRC_DIR
-import agent_common as ac
-import agent_main
+from tools.step3_agent import agent_common as ac
+from tools.step3_agent import agent_main
 
 
 OSS_FUZZ_PROJECTS = OSS_FUZZ_DIR / "projects"

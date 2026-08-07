@@ -4,7 +4,7 @@ step3_build.py — Fuzz Driver 流水线**第三阶段：编译验证与修复**
 
 本脚本是 pipeline 第三阶段的统一入口，也是 `run_pipeline.py --build` 调用的对象。
 
-默认（推荐）跑**多 Agent 编译修复循环**（委托 agent.agent_pipeline）：
+默认（推荐）跑**多 Agent 编译修复循环**（委托 tools.step3_agent.agent_pipeline）：
     注入 → 构建 → 分诊 → 分发修复 → 重构建，循环 ≤ max_rounds，直到全通过或达轮数上限。
 
 两种确定性降级（不进 LLM 修复，供已注入好或无 DeepSeek 凭证时用）：
@@ -34,7 +34,7 @@ import sys
 import json
 
 from config import output_for, OSS_FUZZ_DIR, intermediate_for
-from agent import agent_main
+from tools.step3_agent import agent_main
 
 OSS_FUZZ_PROJECTS = OSS_FUZZ_DIR / "projects"
 
@@ -46,7 +46,7 @@ def run_repair(project: str, max_rounds: int = 3,
     mode 透传给 agent_pipeline，使 restage / diff / inject / replay 全程 mode 隔离。
     无 DeepSeek 凭证时 agent_pipeline 自身会优雅降级为「只注入 + 构建」。
     """
-    from agent import agent_pipeline
+    from tools.step3_agent import agent_pipeline
     return agent_pipeline.run_repair_pipeline(project, max_rounds=max_rounds,
                                               mode=mode)
 
@@ -103,11 +103,11 @@ def build_and_report(project: str, do_build: bool = True,
         block = None
         bsh = proj_dir / "build.sh"
         if bsh.exists():
-            from agent import agent_common as ac
+            from tools.step3_agent import agent_common as ac
             block = ac.read_marked_block(bsh)
         if not block:
             print("[step3] ⚠️ build.sh 未见 dc-injected 标记块——若未注入编译循环，"
-                  "可能只会编到项目自带 harness。可先跑 `python3 -m agent.agent_pipeline "
+                  "可能只会编到项目自带 harness。可先跑 `python3 -m tools.step3_agent.agent_pipeline "
                   f"{project}` 让注入 agent 处理，或手改 build.sh 的标记块。")
         log_path = agent_main.agent_main_build(project, mode=mode)
         print(f"[step3] 构建完成，log: {log_path}")

@@ -27,8 +27,8 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 from config import intermediate_for
-import agent_common as ac
-import agent_main
+from tools.step3_agent import agent_common as ac
+from tools.step3_agent import agent_main
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -72,7 +72,7 @@ def _code_repair_node(project: str, routes: list[dict], ctx: dict) -> None:
         print(f"    [code] 无 DeepSeek 凭证，跳过 {len(routes)} 个代码修复（降级）")
         return
     try:
-        from agent_repair import agent_repair_driver
+        from tools.step3_agent.agent_repair import agent_repair_driver
     except ImportError:
         print("    [code] agent_repair 模块不可用，跳过")
         return
@@ -123,7 +123,7 @@ def _build_fix_node(project: str, routes: list[dict], ctx: dict) -> None:
         print(f"    [build] 无 DeepSeek 凭证，跳过 {len(routes)} 个编译修复（降级）")
         return
     try:
-        from agent_build_fix import agent_build_fix
+        from tools.step3_agent.agent_build_fix import agent_build_fix
     except ImportError:
         print("    [build] agent_build_fix 模块不可用，跳过（降级）")
         return
@@ -161,7 +161,7 @@ def _default_triage(project: str, log_path: Path, failed: set[str],
     routes: list[dict] = []
     if ac.deepseek_available():
         try:
-            from agent_triage import agent_triage
+            from tools.step3_agent.agent_triage import agent_triage
             # 动态调整 max_steps：基础 30，大规模失败时按 1.5 倍计算，上限 100
             adaptive_steps = min(max(30, int(len(failed) * 1.5)), 100)
             routes = agent_triage(project, str(log_path), sorted(failed),
@@ -252,7 +252,7 @@ def run_repair_pipeline(
 
         # P1 #4：读 DC_OFFICIAL_RC，官方构建失败 → 项目环境问题，driver 全缺库，
         # 修复循环空耗；round 1 后若仍全失败且官方 RC!=0，跳过剩余轮次。
-        from agent_main import read_dc_official_rc, global_build_count
+        from tools.step3_agent.agent_main import read_dc_official_rc, global_build_count
         official_rc = read_dc_official_rc(Path(log))
         if failed and official_rc != 0 and r >= 1:
             print(f"  [pipeline] ⚠️ 官方构建失败（DC_OFFICIAL_RC={official_rc}），"

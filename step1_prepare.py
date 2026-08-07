@@ -27,7 +27,7 @@ from config import (
     intermediate_for,
 )
 # 源码自动克隆（与 step3_build 同源，幂等：目录已存在则直接返回 True）
-from agent import agent_main
+from tools.step3_agent import agent_main
 
 # ─── Neo4j 可选 ────────────────────────────────────────────────────
 try:

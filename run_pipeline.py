@@ -66,7 +66,7 @@ class _Tee:
 def run(script, project, args=None, fatal=False, module=None):
     """跑一个子步骤。module 非空时以 `python -m <module>` 形式调用（agent 包内模块用），
     否则按根目录脚本文件 `SCRIPT_DIR/<script>` 调用。统一 cwd=SCRIPT_DIR，
-    保证子进程里 `from config import ...` / `from agent import ...` 能解析。"""
+    保证子进程里 `from config import ...` / `from tools.step3_agent import ...` 能解析。"""
     label = module or script
     print(f"\n{'='*60}")
     print(f">>> {label}")

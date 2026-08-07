@@ -23,9 +23,9 @@ from pathlib import Path
 from typing import Any, Optional
 
 from config import intermediate_for
-import agent_common as ac
+from tools.step3_agent import agent_common as ac
 # 复用 agent_repair 的符号搜索 / 读源码
-from agent_repair import tool_grep_symbol, tool_read_source
+from tools.step3_agent.agent_repair import tool_grep_symbol, tool_read_source
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -488,7 +488,7 @@ def main():
             mode = a.split("=", 1)[1]
         else:
             targets.append(a)
-    from agent_main import diff_products, build_log_path
+    from tools.step3_agent.agent_main import diff_products, build_log_path
     if targets:
         failed = targets
     else:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-plan_loader.py — plan_<mode>.json 的读写接口 + schema 校验
+contracts/plans.py — plan_<mode>.json 的读写接口 + schema 校验
 
 数据契约（重构指导 §4.3）：
   {
@@ -40,14 +40,18 @@ plan_loader.py — plan_<mode>.json 的读写接口 + schema 校验
   }
 
 供 step2（Phase 8 改造后读 plan 填槽）与 plan_gen（Phase 6）共用。
-夹具：plan_loader.SAMPLE_PLAN 是手写的合法 plan，供 step2 无真实 plan 时先跑通。
+夹具：contracts.plans.SAMPLE_PLAN 是手写的合法 plan，供 step2 无真实 plan 时先跑通。
 """
 
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Optional
+
+# 直接执行时把根目录加进 sys.path（与 tools/ 脚本同机制），包形式 import 无需此行
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config import plan_path, MODES, PLAN_VERSION, ROLES
 

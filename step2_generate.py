@@ -26,7 +26,7 @@ from config import (
     VENDOR_SKIP_DIRS, MODES, ROLES,
     intermediate_for, output_for, plan_path,
 )
-from plan_loader import load_plan, PLAN_VERSION
+from contracts.plans import load_plan, PLAN_VERSION
 
 
 # ─── Phase A: 模板处理 ────────────────────────────────────────────

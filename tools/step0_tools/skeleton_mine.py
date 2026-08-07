@@ -25,7 +25,7 @@ from collections import defaultdict, Counter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from config import shared_dir, ROLES, ORDER_FIELD
-from skeleton_loader import save_skeletons, save_scenario, validate_skeletons, validate_scenario
+from contracts.skeletons import save_skeletons, save_scenario, validate_skeletons, validate_scenario
 
 ROLE_DATASET = shared_dir() / "role_dataset.jsonl"
 ROLE_LABELS = shared_dir() / "role_labels.jsonl"

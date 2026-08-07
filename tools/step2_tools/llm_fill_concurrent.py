@@ -15,8 +15,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from config import intermediate_for, shared_dir
-from skeleton_loader import load_skeletons
-from plan_loader import save_plan
+from contracts.skeletons import load_skeletons
+from contracts.plans import save_plan
 import plan_gen
 
 PROJECTS = [

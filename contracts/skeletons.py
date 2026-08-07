@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-skeleton_loader.py — skeletons.json + scenario/<场景>.json 的读写 + schema 校验
+contracts/skeletons.py — skeletons.json + scenario/<场景>.json 的读写 + schema 校验
 
 数据契约（重构指导 §4.1 / §4.2）：
 
@@ -44,8 +44,12 @@ skeleton_mine / plan_gen 的职责）。
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Optional
+
+# 直接执行时把根目录加进 sys.path（与 tools/ 脚本同机制），包形式 import 无需此行
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config import shared_dir, scenario_dir, PLAN_VERSION, ORDER_FIELD, ROLES
 

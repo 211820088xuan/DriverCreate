@@ -32,12 +32,12 @@ from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "step0_tools"))  # 便于 import role_annotate（已搬至 step0_tools）
 from config import intermediate_for, MODES, ROLES, shared_dir
-from plan_loader import save_plan, empty_plan, PLAN_VERSION
+from contracts.plans import save_plan, empty_plan, PLAN_VERSION
 try:
     from role_annotate import _annotate_batch, BATCH_SIZE, FAST_MODEL, STRONG_MODEL, ROLE_LABELS_EXTENDED
 except ImportError:
     _annotate_batch = None
-from skeleton_loader import load_skeletons, load_scenario, skeleton_by_id
+from contracts.skeletons import load_skeletons, load_scenario, skeleton_by_id
 
 
 def _llm_fill_missing_roles(project: str, scored_apis: list[dict],
@@ -642,7 +642,7 @@ def _dedup_check(project: str):
     """三份 plan 生成后做骨架级去重检查，标记 duplicate_of（不删除，§4.3）。"""
     plans = {}
     for mode in MODES:
-        from plan_loader import load_plan
+        from contracts.plans import load_plan
         try:
             plans[mode] = load_plan(project, mode)
         except Exception:
